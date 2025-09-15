@@ -65,3 +65,28 @@ stages:
       hash: md5
       md5: bdf0af39a42bd3fa2642eab858c45e16
       size: 1855076
+  evaluate:
+    cmd: python src/evaluate.py model.pkl data/features
+    deps:
+    - path: data/features
+      hash: md5
+      md5: 74642e90419272839886d8e51f730b44.dir
+      size: 1556292
+      nfiles: 2
+    - path: model.pkl
+      hash: md5
+      md5: bdf0af39a42bd3fa2642eab858c45e16
+      size: 1855076
+    - path: src/evaluate.py
+      hash: md5
+      md5: 125a241720fa69befdb419a3b75e5bfb
+      size: 3300
+    outs:
+    - path: eval/metrics.json
+      hash: md5
+      md5: 2db04cc9d5e1c64adb9e1e0780ec022b
+      size: 195
+    - path: eval/plots/sklearn/prc/train.json
+      hash: md5
+      md5: 93c9d4822e31b03436c238043ddde49d
+      size: 415862
