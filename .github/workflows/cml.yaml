@@ -18,8 +18,8 @@ jobs:
       # If you saved them as secrets, uncomment the two lines below to inject them at runtime.
       - name: Configure DVC remote (optional)
         run: |
-          dvc remote modify --local storage gdrive_client_id "${{ secrets.GDRIVE_CLIENT_ID }}"
-          dvc remote modify --local storage gdrive_client_secret "${{ secrets.GDRIVE_CLIENT_SECRET }}"
+          dvc remote modify --local storage gdrive_client_id "${{ gdrive_client_id }}"
+          dvc remote modify --local storage gdrive_client_secret "${{ gdrive_client_secret}}"
         if: ${{ secrets.GDRIVE_CLIENT_ID != '' && secrets.GDRIVE_CLIENT_SECRET != '' }}
 
       - name: Pull DVC data
