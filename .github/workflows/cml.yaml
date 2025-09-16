@@ -16,7 +16,7 @@ jobs:
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          pip install -r requirements.txt
+          pip install -r src/requirements.txt
           dvc repro 
 
           git fetch --prune
