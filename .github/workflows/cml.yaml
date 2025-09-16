@@ -9,9 +9,17 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 2
-      # Needed for https://github.com/iterative/example-repos-dev/issues/225
-      - name: Installs JSON5
+
+      # Install JSON5
+      - name: Install JSON5
         run: npm install -g json5
+
+      # Pull data tracked by DVC
+      - name: Pull DVC data
+        env:
+          GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}  # or your remote creds
+        run: dvc pull
+
       - name: Generate metrics report
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -22,10 +30,6 @@ jobs:
           git fetch --prune
           dvc metrics diff --show-md main > report.md
 
-
-          # Add figure to the report 
-          echo "## Validating results by region
+          echo "## Validating results by region" >> report.md
           cml-publish eval/plots/images/importance.png --md >> report.md
           cml-send-comment report.md
-
-        
