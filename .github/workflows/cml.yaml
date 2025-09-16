@@ -32,7 +32,7 @@ jobs:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pip install -r src/requirements.txt
-          dvc repro
+          dvc repro 
 
           git fetch --prune
           dvc metrics diff --show-md main > report.md
