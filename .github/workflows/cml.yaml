@@ -1,5 +1,5 @@
 name: CML Report
-on: pull_request
+on: push
 jobs:
   run:
     runs-on: [ubuntu-latest]
@@ -16,48 +16,16 @@ jobs:
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cml ci
-          if [ $GITHUB_REF = refs/heads/main ]; then
-            PREVIOUS_REF=HEAD~1
-          else
-            PREVIOUS_REF=main
-            git fetch origin main:main
-          fi
+          pip install -r requirements.txt
+          dvc repro 
 
-          dvc pull eval
-          dvc plots diff $PREVIOUS_REF workspace \
-            --show-vega --targets ROC | json5 > vega.json
-          vl2svg vega.json roc.svg
+          git fetch --prune
+          dvc metrics diff --show-md main > report.md
 
-          dvc plots diff $PREVIOUS_REF workspace \
-            --show-vega --targets Precision-Recall | json5 > vega.json
-          vl2svg vega.json prc.svg
 
-          dvc plots diff $PREVIOUS_REF workspace \
-            --show-vega --targets Confusion-Matrix | json5 > vega.json
-          vl2svg vega.json confusion.svg
+          # Add figure to the report 
+          echo "## Validating results by region
+          cml-publish eval/plots/images/importance.png --md >> report.md
+          cml-send-comment report.md
 
-          cp eval/plots/images/importance.png importance_workspace.png
-
-          git checkout $PREVIOUS_REF -- dvc.lock
-          cp eval/plots/images/importance.png importance_previous.png
-
-          dvc_report=$(dvc exp diff $PREVIOUS_REF --md)
-
-          cat <<EOF > report.md
-          # CML Report
-          ## Plots
-          ![ROC](./roc.svg)
-          ![Precision-Recall](./prc.svg)
-          ![Confusion Matrix](./confusion.svg)
-          #### Feature Importance: ${PREVIOUS_REF}
-          ![Feature Importance: ${PREVIOUS_REF}](./importance_previous.png)
-          #### Feature Importance: workspace
-          ![Feature Importance: workspace](./importance_workspace.png)
-
-          ## Metrics and Params
-          ### ${PREVIOUS_REF} → workspace
-          ${dvc_report}
-          EOF
-
-          cml comment create --publish --pr=false report.md
+        
