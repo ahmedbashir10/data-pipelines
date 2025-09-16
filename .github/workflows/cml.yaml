@@ -1,8 +1,6 @@
 name: CML Report
 
 on:
-  push:
-    branches: [main, experiment]
   pull_request:
     branches: [main]
 
@@ -14,28 +12,18 @@ jobs:
   run:
     runs-on: ubuntu-latest
     env:
-      # make secrets available as env so they can be used in `if:`
       GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
-      GDRIVE_CLIENT_ID: ${{ secrets.GDRIVE_CLIENT_ID }}
-      GDRIVE_CLIENT_SECRET: ${{ secrets.GDRIVE_CLIENT_SECRET }}
     steps:
       - uses: iterative/setup-cml@v2
       - uses: iterative/setup-dvc@v1
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
+        with: { fetch-depth: 2 }
 
       - name: Install JSON5
         run: npm install -g json5
 
       - name: Install DVC GDrive plugin
         run: pip install dvc-gdrive
-
-      - name: Configure DVC remote (only if id/secret exist)
-        if: ${{ env.GDRIVE_CLIENT_ID != '' && env.GDRIVE_CLIENT_SECRET != '' }}
-        run: |
-          dvc remote modify --local storage gdrive_client_id "$GDRIVE_CLIENT_ID"
-          dvc remote modify --local storage gdrive_client_secret "$GDRIVE_CLIENT_SECRET"
 
       - name: Pull DVC data
         run: dvc pull
